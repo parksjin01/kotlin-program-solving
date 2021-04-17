@@ -30,40 +30,18 @@ enum class Direction {
     }
 }
 
-object Solution {
-    val board: Array<Array<Int>> = Array(200, {
-        Array(200, {
-            0
-        })
-    })
-
-    fun solve() {
-        val numberOfCurves = readLine() ?. toInt() ?: 0
-
-        for (i in 0 .. numberOfCurves - 1) {
-            val input: List<Int> = readLine() ?. split(" ") ?. map { v -> v.toInt() } ?. toList() ?: emptyList()
-            val x: Int = input[0]
-            val y: Int = input[1]
-            val initialDirection: Direction = Direction.Util.fromId(input[2])
-            val gen: Int = input[3]
-
-//            println("${x}, ${y}, ${gen}, ${initialDirection}")
-            val initialCurve: List<Direction> = listOf(initialDirection)
-            val curves: List<Direction> = createDragonCurve(initialCurve, gen).reversed()
-
-            mark(y, x, curves)
-        }
-
-        println(counter())
-    }
-
-    fun createDragonCurve(prevCurves: List<Direction>, iter: Int): List<Direction> {
-        if (iter == 0)
+object CurveGenerator {
+    fun createCurve(prevCurves: List<Direction>, gen: Int): List<Direction> {
+        if (gen == 0)
             return prevCurves
 
         val newCurvesToAdd: List<Direction> = prevCurves.reversed().map { direction: Direction -> direction.next() }.toList()
-        return createDragonCurve(newCurvesToAdd + prevCurves, iter - 1)
+        return createCurve(newCurvesToAdd + prevCurves, gen - 1)
     }
+}
+
+object Board {
+    private val board: Array<Array<Int>> = Array(200) { Array(200) { 0 } }
 
     fun mark(y: Int, x: Int, curves: List<Direction>) {
         board[y][x] = 1
@@ -82,7 +60,7 @@ object Solution {
         }
     }
 
-    fun counter(): Int {
+    fun count(): Int {
         var cnt: Int = 0
 
         for (y: Int in 0 .. 99) {
@@ -93,6 +71,25 @@ object Solution {
         }
 
         return cnt
+    }
+}
+
+object Solution {
+    fun solve() {
+        val numberOfCurves = readLine() ?. toInt() ?: 0
+
+        for (i in 0 until numberOfCurves) {
+            val input: List<Int> = readLine() ?. split(" ") ?. map { v -> v.toInt() } ?. toList() ?: emptyList()
+            val (x: Int, y: Int, directionId: Int, gen: Int) = input
+            val initialDirection: Direction = Direction.Util.fromId(directionId)
+
+            val initialCurve: List<Direction> = listOf(initialDirection)
+            val curves: List<Direction> = CurveGenerator.createCurve(initialCurve, gen).reversed()
+
+            Board.mark(y, x, curves)
+        }
+
+        println(Board.count())
     }
 }
 
