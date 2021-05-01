@@ -2,18 +2,33 @@ package p1966
 
 data class Page(val index: Int, val priority: Int)
 
-object Printer {
-    fun print(pages: List<Page>, targetIndex: Int): Int {
-        while (pages.size > 0) {
-            if (pages[0].priority == pages.maxOf { it.priority }) {
-                val printedPage = pages[0]
-                if (printedPage.index == targetIndex) {
-                    return 1
+class Printer(val queue: MutableList<Page>) {
+    var counter: Int = 0
+
+    fun isMostTopPriority(page: Page): Boolean {
+        return page.priority == queue.maxOf { page -> page.priority }
+    }
+
+    fun moveToBack(queue: MutableList<Page>): Unit {
+        queue.add(queue.removeAt(0))
+    }
+
+    fun isTargetPage(page: Page, targetIndex: Int): Boolean {
+        return page.index == targetIndex
+    }
+
+    fun print(targetIndex: Int): Int {
+        while (!queue.isEmpty()) {
+            if (isMostTopPriority(queue[0])) {
+                val printedPage: Page = queue.removeFirst()
+
+                if (isTargetPage(printedPage, targetIndex)) {
+                    return counter + 1
                 } else {
-                    return print(pages.subList(1, pages.size), targetIndex) + 1
+                    counter += 1
                 }
             } else {
-                return print(pages.subList(1, pages.size) + pages[0], targetIndex)
+                moveToBack(queue)
             }
         }
 
@@ -31,7 +46,8 @@ object Solution {
             val pages: List<Page> = readLine()?.split(" ")?.map { it.toInt() }
                 ?.mapIndexed { index, priority -> Page(index, priority) } ?: emptyList()
 
-            println(Printer.print(pages, targetIndex))
+            val printer: Printer = Printer(pages.toMutableList())
+            println(printer.print(targetIndex))
         }
     }
 }
