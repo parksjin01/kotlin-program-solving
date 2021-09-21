@@ -28,9 +28,12 @@ class Room(val height: Int, val width: Int, var roomInfo: MutableList<MutableLis
         return true
     }
 
+    private fun isAirCleaner(point: Point): Boolean {
+        return roomInfo[point.y][point.x] == -1
+    }
+
     fun diffuse() {
         val newRoomInfo: Array<Array<Int>> = Array(height) {Array(width) {0} }
-        val adjacentDirection: List<Point> = listOf(Point(-1, 0), Point(1, 0), Point(0, -1), Point(0, 1))
 
         for (y in 0 until height) {
             for (x in 0 until width) {
@@ -42,10 +45,10 @@ class Room(val height: Int, val width: Int, var roomInfo: MutableList<MutableLis
                     continue
                 }
 
-                for (dir in adjacentDirection) {
+                for (dir in Direction.values()) {
                     val newPos: Point = curPos + dir
 
-                    if (pointInRoom(newPos) && roomInfo[newPos.y][newPos.x] != -1) {
+                    if (pointInRoom(newPos) && isAirCleaner(newPos) == false) {
                         currentDust -= roomInfo[y][x] / 5
                         currentDust += roomInfo[newPos.y][newPos.x] / 5
                     }
@@ -63,16 +66,7 @@ class Room(val height: Int, val width: Int, var roomInfo: MutableList<MutableLis
     }
 
     fun countDust(): Int {
-        var cnt: Int = 0
-
-        for (y in 0 until height) {
-            for (x in 0 until width) {
-                if (roomInfo[y][x] != -1)
-                    cnt += roomInfo[y][x]
-            }
-        }
-
-        return cnt
+        return roomInfo.map { it.sum() }.sum() + 2
     }
 }
 
