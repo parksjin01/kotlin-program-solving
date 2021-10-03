@@ -2,7 +2,7 @@ package p15964
 
 object Solution {
     fun solve() {
-        val (a: Int, b: Int) = readLine() ?. split(" ") ?. map { it.toInt() } ?: listOf(0, 0)
+        val (a: Long, b: Long) = readLine() ?. split(" ") ?. map { it.toLong() } ?: listOf(0L, 0L)
         println((a + b) * (a - b))
     }
 }
