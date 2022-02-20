@@ -6,6 +6,8 @@ import java.util.Queue
 data class Coordinate(val y: Int, val x: Int)
 
 object Solution {
+    val result: MutableList<Int> = MutableList(3) { 0 }
+
     fun isSameValue(board: List<List<Int>>, start: Coordinate, size: Int): Boolean {
         val current: Int = board[start.y][start.x]
 
@@ -19,31 +21,26 @@ object Solution {
 
         return true
     }
-    fun count(board: List<List<Int>>, start: Coordinate, size: Int): List<Int> {
-        val result: MutableList<Int> = mutableListOf()
-
+    fun count(board: List<List<Int>>, start: Coordinate, size: Int) {
         if (isSameValue(board, start, size)) {
-            result.add(board[start.y][start.x])
+            result[(board[start.y][start.x] + 1)] +=  1
         } else {
             for (dy: Int in 0 until size step (size / 3)) {
                 for (dx: Int in 0 until size step (size / 3)) {
-                    val res = count(board, Coordinate(start.y + dy, start.x + dx), size / 3)
-                    result.addAll(res)
+                    count(board, Coordinate(start.y + dy, start.x + dx), size / 3)
                 }
             }
         }
-
-        return result
     }
 
     fun solve() {
         val size: Int = readLine() ?. toInt() ?: 0
         val board: List<List<Int>> = (0 until size).map { readLine() ?. split(" ") ?. map { it.toInt() } ?: emptyList() }.toList()
-        val result: List<Int> = count(board, Coordinate(0, 0), size)
+        count(board, Coordinate(0, 0), size)
 
-        println(result.count { it == -1 } )
-        println(result.count { it == 0 } )
-        println(result.count { it == 1 } )
+        println(result[0] )
+        println(result[1] )
+        println(result[2] )
     }
 }
 
